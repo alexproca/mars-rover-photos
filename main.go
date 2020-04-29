@@ -43,11 +43,27 @@ func main() {
 func cameraHandler(writer http.ResponseWriter, request *http.Request) {
 	roverNameAndCamera := strings.TrimPrefix(request.URL.Path, "/camera/")
 
-	if photos, photosError := entities.GetPhotos(roverNameAndCamera); photosError == nil {
+	tokens := strings.Split(roverNameAndCamera, "/")
+
+	if len(tokens) != 3 {
+		fmt.Println(errors.New(fmt.Sprintf("Incorrect path '%s'", roverNameAndCamera)))
+		http.Redirect(writer, request, "/static/error.html", 302)
+		return
+	}
+
+	roverName, cameraName, earthDate := tokens[0], tokens[1], tokens[2]
+
+	if photos, photosError := entities.GetPhotos(roverName, cameraName, earthDate); photosError == nil {
 		items := struct {
 			Photos []entities.Photo
+			RoverName string
+			CameraName string
+			EarthDate string
 		}{
 			Photos: photos,
+			RoverName: roverName,
+			CameraName: cameraName,
+			EarthDate: earthDate,
 		}
 		if templateError := util.TemplateHandler("photos", items, writer); templateError != nil {
 			fmt.Println(templateError)

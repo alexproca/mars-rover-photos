@@ -2,11 +2,9 @@ package entities
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"nasa-api/config"
 	"nasa-api/util"
-	"strings"
 )
 
 //Camera - camera of the rover
@@ -88,15 +86,9 @@ func GetRover(roverName string) (*Rover, error) {
 
 }
 
-func GetPhotos(roverNameAndCamera string) ([]Photo, error) {
+func GetPhotos(roverName, cameraName, earthDate string) ([]Photo, error) {
 
-	tokens := strings.Split(roverNameAndCamera, "/")
-
-	if len(tokens) != 3 {
-		return nil, errors.New(fmt.Sprintf("Incorrect path '%s'", roverNameAndCamera))
-	}
-
-	roverName, cameraName, earthDate, endPointData := tokens[0], tokens[1], tokens[2], config.Config.EndpointData
+	endPointData := config.Config.EndpointData
 	pageNumber := 1
 
 	//https://api.nasa.gov/mars-photos/api/v1/rovers/Spirit/photos?page=1&earth_date=2004-01-10&camera=fhaz&api_key=SijUgWPLeaBPwiMNl8w7Ce1jKnud42GRhKW6O7Ro
