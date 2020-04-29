@@ -1,0 +1,4 @@
+github.com/Netflix/go-env v0.0.0-20200312172415-986dfe862277 h1:lHbOeRsg063kiE7Eo4MahXgBm47uhMWax0i1jdWPG2I=
+github.com/Netflix/go-env v0.0.0-20200312172415-986dfe862277/go.mod h1:9XMFaCeRyW7fC9XJOWQ+NdAv8VLG7ys7l3x4ozEGLUQ=
+github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
+github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=

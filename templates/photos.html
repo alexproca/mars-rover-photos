@@ -1,0 +1,80 @@
+{{$rover := .Rover}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.css">
+    <link rel="stylesheet" href="/css/main.css">
+
+    <title>Mars Image Explorer</title>
+</head>
+<body>
+
+<main id="app" class="wrapper">
+
+    <nav class="navbar">
+
+            <ul>
+                <li >
+                    <a href="/" > <- Mission Control</a>
+                </li>
+            </ul>
+
+    </nav>
+
+    <header class="header">
+
+        <section class="container">
+            <div class="row">
+                <div class="column column-20">
+
+                </div>
+                <div class="column column-60">
+                    <h1> {{ .Rover.Name }} </h1>
+                </div>
+                <div class="column column-20">
+                    <a class="button danger" href="/static/error.html" alt="Boom">Self destruct button (use with caution)</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column">
+                    <h3>Launch date: {{ .Rover.LaunchDate }}</h3>
+                    <h3>Landing date: {{ .Rover.LandingDate }}</h3>
+                    <h3>Last date: {{ .Rover.MaxDate }}</h3>
+                    <h3>Status: {{ .Rover.Status }}</h3>
+                    <h3>Photos: {{ .Rover.TotalPhotos }}</h3>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column">
+                    <h3>Select your camera:</h3>
+                </div>
+            </div>
+
+            {{range .Rover.Cameras }}
+            <div class="row">
+                    <div class="column column-20">
+                        <a class="button" href="/camera/{{ $rover.Name }}/{{.Name}}" alt="{{ .FullName }}">{{.Name}}</a>
+                    </div>
+                <div class="column column-80">
+                    <h4>{{ .FullName }}</h4>
+                </div>
+            </div>
+            {{end}}
+
+        </section>
+
+
+    </header>
+
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.css">
+    <link rel="stylesheet" href="/css/main.css">
+
+    <title>Mars Image Explorer</title>
+</head>
+<body>
+
+    <main id="app" class="wrapper">
+
+        <nav class="navigation">
+            <section class="container">
+                <a href="#" class="navigation-title">
+                    <h3 class="title">Mars Street View</h3>
+                </a>
+            </section>
+        </nav>
+
+        <header class="header">
+
+            <section class="container">
+                <div class="row">
+                    <div class="column column-20">
+
+                    </div>
+                    <div class="column column-60">
+                        <h1>Hi! Welcome on mars realtime.</h1>
+                        <h2>Well ... as realtime as possible ATM but have no fear! Elon is working on it.</h2>
+
+                        <img src="/img/elon-tusk.jpg" alt="Elon Tusk">
+
+                        <h1> Select your rover!</h1>
+                    </div>
+                    <div class="column column-20">
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    {{range .Rovers}}
+                        <div class="column">
+                            <a class="button" href="./rover/{{.Name}}/?selected_date={{ .LandingDate }}">{{.Name}}</a>
+                        </div>
+                    {{end}}
+                </div>
+            </section>
+
+
+        </header>
+
+
+    </main>
+
+</body>
+</html>
