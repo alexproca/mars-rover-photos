@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"nasa-api/config"
 	"net/http"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -40,13 +42,13 @@ func getBody(url string) ([]byte, bool) {
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(safeString(err.Error()))
 		return body, false
 	}
 
 	res, getErr := httpClient.Do(req)
 	if getErr != nil {
-		fmt.Println(getErr)
+		fmt.Println(safeString(getErr.Error()))
 		return body, false
 	}
 
@@ -56,7 +58,7 @@ func getBody(url string) ([]byte, bool) {
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		fmt.Println(readErr)
+		fmt.Println(safeString(readErr.Error()))
 		return body, false
 	}
 
@@ -81,4 +83,9 @@ func TemplateHandler(templateName string, items interface{}, writer http.Respons
 		fmt.Println(err)
 	}
 	return t.Execute(writer, items)
+}
+
+func safeString(in string) (out string) {
+	out = strings.Replace(in, config.Config.EndpointData.ApiKey, "**********", -1)
+	return
 }
