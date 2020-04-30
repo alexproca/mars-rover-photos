@@ -9,4 +9,6 @@ COPY .env /app
 COPY templates /app/templates
 COPY public /app/public
 
+ENV INTERFACE=0.0.0.0
+
 CMD ["/app/server"]
