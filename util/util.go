@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"nasa-api/config"
 	"net/http"
 	"os"
@@ -17,7 +18,8 @@ const (
 	RETRIES int           = 4
 )
 
-func GetBody(url string) []byte {
+// HTTPGet - return http get content at url as []byte
+func HTTPGet(url string) []byte {
 
 	body := []byte{}
 
@@ -42,13 +44,13 @@ func getBody(url string) ([]byte, bool) {
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Println(safeString(err.Error()))
+		log.Println(SafeString(err.Error()))
 		return body, false
 	}
 
 	res, getErr := httpClient.Do(req)
 	if getErr != nil {
-		fmt.Println(safeString(getErr.Error()))
+		log.Println(SafeString(getErr.Error()))
 		return body, false
 	}
 
@@ -58,7 +60,7 @@ func getBody(url string) ([]byte, bool) {
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		fmt.Println(safeString(readErr.Error()))
+		log.Println(SafeString(readErr.Error()))
 		return body, false
 	}
 
@@ -70,22 +72,23 @@ func SystemSignalsHandler(signals chan os.Signal) {
 		sig := <-signals
 		switch sig {
 		case syscall.SIGINT:
-			fmt.Printf("\nCtrl-C signalled\n")
+			log.Println("\nCtrl-C signalled\n")
 			os.Exit(0)
 		}
 	}()
 }
 
-
+//TemplateHandler - fill template and send result
 func TemplateHandler(templateName string, items interface{}, writer http.ResponseWriter) error {
 	t, err := template.ParseFiles(fmt.Sprintf("templates/%s.html", templateName))
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("Parse error for template '%s'\n %s \n", templateName, err)
 	}
 	return t.Execute(writer, items)
 }
 
-func safeString(in string) (out string) {
+//SafeString - remove sensitive data from logged strings
+func SafeString(in string) (out string) {
 	out = strings.Replace(in, config.Config.EndpointData.ApiKey, "**********", -1)
 	return
 }

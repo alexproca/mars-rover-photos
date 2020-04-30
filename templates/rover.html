@@ -1,5 +1,6 @@
 {{$rover := .Rover }}
 {{$currentDate := .CurrentDate }}
+{{$endDate := .Rover.MaxDate }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,7 +80,7 @@
             {{range .Rover.Cameras }}
             <div class="row">
                     <div class="column column-20">
-                        <a class="button" href="/camera/{{ $rover.Name }}/{{ .Name }}/{{ $currentDate }}" alt="{{ .FullName }}">{{ .Name }}</a>
+                        <a class="button" href="/camera/{{ $rover.Name }}/{{ .Name }}/{{ $currentDate }}/{{ $endDate }}" alt="{{ .FullName }}">{{ .Name }}</a>
                     </div>
                 <div class="column column-80">
                     <h4>{{ .FullName }}</h4>
@@ -88,11 +89,7 @@
             {{end}}
 
         </section>
-
-
     </header>
-
-
 </main>
 
 </body>

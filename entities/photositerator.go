@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+//PhotosIterator - iterate over photos
 type PhotosIterator struct {
 	RoverName   string
 	CameraName  string
@@ -13,6 +14,7 @@ type PhotosIterator struct {
 	NextPhotos  []Photo
 }
 
+//NewPhotosIterator - create a photos iterator for a specified camera on a specified rover starting with a specified date
 func NewPhotosIterator(roverName, cameraName, startDate, maxDate string) (*PhotosIterator, error) {
 
 	result := &PhotosIterator{
@@ -35,6 +37,7 @@ func NewPhotosIterator(roverName, cameraName, startDate, maxDate string) (*Photo
 	return result, nil
 }
 
+//Next - get next photo
 func (self *PhotosIterator) Next() (*Photo) {
 	arr := self.NextPhotos
 	head, arr := arr[0], arr[1:]
@@ -43,7 +46,8 @@ func (self *PhotosIterator) Next() (*Photo) {
 	return &head
 }
 
-func (self *PhotosIterator) hasNext() bool {
+//HasNext - are there any more photos ?
+func (self *PhotosIterator) HasNext() bool {
 
 	for len(self.NextPhotos) == 0 && self.CurrentDate.Unix() <= self.MaxDate.Unix() {
 
@@ -63,10 +67,8 @@ func (self *PhotosIterator) hasNext() bool {
 }
 
 func (self *PhotosIterator) getDateString() string {
-
 	if self == nil {
 		return ""
 	}
-
 	return self.CurrentDate.Format("2006-01-02")
 }

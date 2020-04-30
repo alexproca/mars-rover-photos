@@ -9,8 +9,6 @@ import (
 
 var once sync.Once
 
-
-
 func TestNewPhotosIteratorStart(t *testing.T) {
 
 	loadTestsConfig(t)
@@ -25,7 +23,7 @@ func TestNewPhotosIteratorStart(t *testing.T) {
 		t.Error("New Iterator is nil")
 	}
 
-	next := it.hasNext()
+	next := it.HasNext()
 
 	if next == false {
 		t.Error("We should have next photos")
@@ -40,7 +38,7 @@ func TestNewPhotosIteratorStart(t *testing.T) {
 	firstUrl := image.ImageURL
 
 	i := 0
-	for it.hasNext() && i< 100 {
+	for it.HasNext() && i< 100 {
 		i++
 		image = it.Next()
 		t.Logf("Date: %s i: %d link: %s", it.CurrentDate, i, image.ImageURL)
@@ -76,7 +74,7 @@ func TestNewPhotosIteratorEnd(t *testing.T) {
 		t.Error("New Iterator is nil")
 	}
 
-	next := it.hasNext()
+	next := it.HasNext()
 
 	image := it.Next()
 
@@ -89,7 +87,7 @@ func TestNewPhotosIteratorEnd(t *testing.T) {
 	}
 
 	i := 0
-	for it.hasNext() && i < 100 {
+	for it.HasNext() && i < 100 {
 		i++
 		image = it.Next()
 		t.Logf("Date: %s i: %d link: %s", it.CurrentDate, i, image.ImageURL)

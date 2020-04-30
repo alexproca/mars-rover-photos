@@ -20,6 +20,11 @@ type MainConfig struct {
 	} `json:"server_data"`
 }
 
+//MainConfig - main config used across application (read config from .env file or from env.
+//You can specify settings standalone as env variables (ex: NASA_API_KEY) or you can create a json
+//respecting MainConfig structure above and store it in JSON_CONFIG env var
+var Config MainConfig = MainConfig{}
+
 func jsonDefault() []byte {
 	if jsonConfig := os.Getenv("JSON_CONFIG"); jsonConfig == "" {
 		return []byte(`{
@@ -35,7 +40,6 @@ func jsonDefault() []byte {
 		return []byte(jsonConfig)
 	}
 }
-var Config MainConfig = MainConfig{}
 
 func LoadConfig(filenames... string) {
 

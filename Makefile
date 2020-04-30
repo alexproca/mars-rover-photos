@@ -1,5 +1,5 @@
 run:
-	-@go run main.go
+	@go run main.go
 
 clean:
 	-@rm app
@@ -16,11 +16,16 @@ build-docker: build-linux
 	docker build -t nasa-api .
 
 run-docker: build-docker stop-docker
-	docker run --rm --name="nasa-api" -p "127.0.0.1:8080:8080" -d nasa-api
+	docker run --rm --name="nasa-api" -p "127.0.0.1:8081:8080" -d nasa-api
 
 stop-docker:
-	docker rm -f nasa-api
+	-docker rm -f nasa-api
 
 
 test:
 	go test -v ./...
+
+deploy-heroku: build-linux
+	heroku container:push web --app nasa-rover-photos
+	heroku container:release web --app nasa-rover-photos
+

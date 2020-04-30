@@ -1,8 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"log"
 	"nasa-api/config"
 	"nasa-api/entities"
 	"nasa-api/util"
@@ -11,6 +11,9 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 func main() {
@@ -34,10 +37,74 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/rover/", roverHandler)
 	http.HandleFunc("/camera/", cameraHandler)
+	http.HandleFunc("/ws/", wsHandler)
+	http.HandleFunc("/ws", wsHandler)
 
-	fmt.Printf("Starting server on interface '%s' and port '%s'\n", httpConfig.Interface, httpConfig.Port)
+	log.Printf("Starting server on interface '%s' and port '%s'\n", httpConfig.Interface, httpConfig.Port)
 	http.ListenAndServe(fmt.Sprintf("%s:%s", httpConfig.Interface, httpConfig.Port), nil)
 
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+func wsHandler(writer http.ResponseWriter, request *http.Request) {
+	ws, upgradeError := upgrader.Upgrade(writer, request, nil)
+
+	if upgradeError != nil {
+		log.Println(upgradeError)
+		return
+	}
+
+	go handleConnection(ws)
+}
+
+func handleConnection(ws *websocket.Conn) {
+	defer ws.Close()
+
+	messageType, message, readErr := ws.ReadMessage()
+	if readErr != nil {
+		log.Println("Read Error:", readErr)
+		return
+	}
+
+	if messageType == websocket.TextMessage {
+		stringMessage := string(message)
+		data := strings.Split(stringMessage, "/")
+
+		if len(data) != 6 {
+			log.Println("Bad request:", stringMessage)
+			return
+		}
+
+		rover, camera, currentDate, maxDate := data[2], data[3], data[4], data[5]
+		it, err := entities.NewPhotosIterator(rover, camera, currentDate, maxDate)
+
+		if err != nil {
+			log.Println("Cannot create iterator:", stringMessage)
+			return
+		}
+
+		ticker := time.NewTicker(time.Second * 5)
+
+		for it.HasNext() {
+
+			photo := it.Next()
+			response := photo.ImageURL
+
+			err := ws.WriteMessage(websocket.TextMessage, []byte(response))
+			if err != nil {
+				log.Println("Write error:", err)
+				break
+			}
+
+			log.Println("Sending: ", response)
+			<-ticker.C
+		}
+	}
 }
 
 func cameraHandler(writer http.ResponseWriter, request *http.Request) {
@@ -45,32 +112,27 @@ func cameraHandler(writer http.ResponseWriter, request *http.Request) {
 
 	tokens := strings.Split(roverNameAndCamera, "/")
 
-	if len(tokens) != 3 {
-		fmt.Println(errors.New(fmt.Sprintf("Incorrect path '%s'", roverNameAndCamera)))
+	if len(tokens) != 4 {
+		log.Println("Incorrect camera path: ", roverNameAndCamera)
 		http.Redirect(writer, request, "/static/error.html", 302)
 		return
 	}
 
-	roverName, cameraName, earthDate := tokens[0], tokens[1], tokens[2]
+	roverName, cameraName, earthDate, maxDate := tokens[0], tokens[1], tokens[2], tokens[3]
 
-	if photos, photosError := entities.GetPhotos(roverName, cameraName, earthDate); photosError == nil {
-		items := struct {
-			Photos []entities.Photo
-			RoverName string
-			CameraName string
-			EarthDate string
-		}{
-			Photos: photos,
-			RoverName: roverName,
-			CameraName: cameraName,
-			EarthDate: earthDate,
-		}
-		if templateError := util.TemplateHandler("photos", items, writer); templateError != nil {
-			fmt.Println(templateError)
-			http.Redirect(writer, request, "/static/error.html", 302)
-		}
-	} else {
-		fmt.Println(photosError)
+	items := struct {
+		RoverName  string
+		CameraName string
+		EarthDate  string
+		MaxDate    string
+	}{
+		RoverName:  roverName,
+		CameraName: cameraName,
+		EarthDate:  earthDate,
+		MaxDate:    maxDate,
+	}
+	if templateError := util.TemplateHandler("photos", items, writer); templateError != nil {
+		log.Println(templateError)
 		http.Redirect(writer, request, "/static/error.html", 302)
 	}
 }
@@ -83,7 +145,7 @@ func roverHandler(writer http.ResponseWriter, request *http.Request) {
 		selectedDateValues := request.URL.Query()["selected_date"]
 
 		if len(selectedDateValues) != 1 {
-			fmt.Println(errors.New("Something is not right with selected date"))
+			log.Println("Something is not right with selected date", selectedDateValues)
 			http.Redirect(writer, request, "/static/error.html", 302)
 		}
 
@@ -101,11 +163,11 @@ func roverHandler(writer http.ResponseWriter, request *http.Request) {
 			CurrentDate: selectedDate,
 		}
 		if templateError := util.TemplateHandler("rover", items, writer); templateError != nil {
-			fmt.Println(templateError)
+			log.Println("Something is wrong with template: rover", templateError)
 			http.Redirect(writer, request, "/static/error.html", 302)
 		}
 	} else {
-		fmt.Println(retrieveRoverError)
+		log.Printf("Something went wrong retrieving rover '%s' informatioin from NASA API: %s\n", roverName, retrieveRoverError)
 		http.Redirect(writer, request, "/static/error.html", 302)
 	}
 }
@@ -120,12 +182,11 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 		}
 
 		if err := util.TemplateHandler("index", items, writer); err != nil {
-			fmt.Println(err)
+			log.Println("Something is wrong with template: index", err)
 			http.Redirect(writer, request, "/static/error.html", 302)
 		}
 	} else {
-		fmt.Println(getRoversError)
+		log.Println("Something went wrong retrieving all rovers from NASA API: ", getRoversError)
 		http.Redirect(writer, request, "/static/error.html", 302)
 	}
 }
-

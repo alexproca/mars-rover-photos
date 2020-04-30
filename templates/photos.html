@@ -44,21 +44,21 @@
                 <div class="column">
                     <h3>Camera name: {{ .CameraName }}</h3>
                     <h3>Start date: {{ .EarthDate }}</h3>
+                    <a id="connect_button" class="button" href="#" >Connect</a>
+                </div>
+                <div class="column">
+
                 </div>
             </div>
 
-            {{range .Photos}}
-                <div class="row">
-                    <div class="column">
-
-                        <img src="{{ .ImageURL }}" height="720" width="1280" alt="">
-                        
-                    </div>
+            <div class="row">
+                <div class="column">
+                    <img id="screen_img" src="/img/static.jpg" height="720" width="1280" alt="Image received">
                 </div>
-            {{end}}
+            </div>
         </section>
     </header>
 </main>
-
+<script src="/js/fetch_photos.js"></script>
 </body>
 </html>
