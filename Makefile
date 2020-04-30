@@ -5,10 +5,13 @@ clean:
 	-@rm app
 	-@rm server
 
-build:
+dependencies:
+	go mod download
+
+build: dependencies
 	go build -o app
 
-build-linux:
+build-linux: dependencies
 	-@rm server
 	env GOOS=linux GOARCH=amd64 go build -o server
 
@@ -20,7 +23,6 @@ run-docker: build-docker stop-docker
 
 stop-docker:
 	-docker rm -f nasa-api
-
 
 test:
 	go test -v ./...
