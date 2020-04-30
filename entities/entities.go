@@ -27,6 +27,7 @@ type Rover struct {
 }
 
 type Photo struct {
+	ID int `json:"id"`
 	Sol int `json:"sol"`
 	EarthDay string `json:"earth_date"`
 	ImageURL string `json:"img_src"`

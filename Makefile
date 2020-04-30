@@ -19,3 +19,7 @@ run-docker:
 
 stop-docker:
 	docker rm -f nasa-api
+
+
+test:
+	go test -v ./...
